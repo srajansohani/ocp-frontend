@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom"
+import { Playground } from "./playground";
 
 //Add all routes here
 function MainApp() {
@@ -8,6 +9,7 @@ function MainApp() {
           <Route path="/" element={ <Home/> } />
           <Route path="about" element={ <About/> } />
           <Route path="contact" element={ <Contact/> } />
+          <Route path="/playground" element={<Playground />} />
         </Routes>
       </div>
     )
