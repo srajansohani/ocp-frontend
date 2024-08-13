@@ -25,8 +25,8 @@ export const ProblemList = () => {
     }, []);
 
     const redirectToProblem = (problem_id) => {
-        console.log(problem_id);
-        // navigate(`/problem?problem_id=${problem_id}`);
+        // console.log(problem_id);
+        navigate(`/problem?problem_id=${problem_id}`);
     };
 
     return (
@@ -43,7 +43,7 @@ export const ProblemList = () => {
                 dataSource={problems}
                 renderItem={(item) => (
                     <List.Item
-                        onClick={redirectToProblem(item._id)}
+                        onClick={() => redirectToProblem(item._id)}
                         key={item.title}
                         actions={[
                             <IconText
