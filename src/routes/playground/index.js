@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Editor } from '@monaco-editor/react'
-import { Button, Select } from 'antd'
+import { Button, Select, Spin } from 'antd'
 import { TestCaseContainer } from './TestCaseContainer';
 import TextArea from 'antd/es/input/TextArea';
 import { initPanelComponentToken } from 'antd/es/date-picker/style';
@@ -10,6 +10,7 @@ export const Playground = () => {
     const [language, setLanguage] = useState();
     const [output,setOutput] = useState("");
     const [input,setInput] = useState("");
+    const [loader,setLoader] = useState(false);
 
     const intervalRef = useRef(null);
     const check = async (id) => {
@@ -21,6 +22,7 @@ export const Playground = () => {
                 // console.log(data);
                 clearInterval(intervalRef.current);
                 const decoded_output = atob(data?.output);
+                setLoader(false);
                 setOutput(decoded_output);
             }
         }
@@ -46,6 +48,7 @@ export const Playground = () => {
             body: JSON.stringify(submission)
         })
         const data = await res.json();
+        setLoader(true);
         intervalRef.current = setInterval(() => check(data._id), 500);
     }
     return <>
@@ -85,7 +88,8 @@ export const Playground = () => {
             </div>
             <div className='basis-1/2 ml-2'>
                 <p className='shadow-md text-2xl mb-3 mt-2 ' >Input: </p>
-                <TextArea
+                {
+                    loader ? <Spin /> : <TextArea
                     onChange={(event)=>{
                         console.log(event.target.value)
                         setInput(event.target.value);
@@ -93,7 +97,10 @@ export const Playground = () => {
                     style={{
                         height: "400px"
                        }}
+
                 />
+                }
+                
                 <div>
                     <p className='shadow-md text-2xl mb-3 mt-2 ' >Output: </p>
                     <TextArea
