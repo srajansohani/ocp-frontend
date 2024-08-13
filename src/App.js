@@ -13,10 +13,7 @@ function App(){
   return <>
     <Navbar />
     <MainApp />
-    <button onClick={()=>{dispatch(incrementByAmount(3))}}>
-      increment
-    </button>
-    <h1>{count}</h1>
+
 
   </>
 }

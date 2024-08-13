@@ -17,12 +17,9 @@ class Testcase {
         this.score=0
      }
 }
-export const TestCaseContainer = ({submission,testcases,setTestcases})=>{
-        const [segment,setSegment] = useState("Testcase");
+export const TestCaseContainer = ({segment,setSegment,results,testcases,setTestcases})=>{
+        
         console.log(testcases);
-        if(submission?.status === "submitted"){
-            setSegment("Testresult");
-        }
         return <>
         <div>
             <div className="mb-0 flex flex-row">
@@ -84,21 +81,15 @@ export const TestCaseContainer = ({submission,testcases,setTestcases})=>{
                     (testcases) && testcases.map((testcase,index)=>{
                         return (
                             <div>
-                                <div>
+                                <div onClick={()=>{}}>
                                     Case {index}
                                 </div>
-                                <TextArea value={submission?.test_cases[index]?.test_case?.output} />
+                                <TextArea contentEditable={false} value={index < results.length ? atob(results[index]): ""} />
                             </div>
                         )
                     })
                 }
                 </div>
-                <PlusCircleOutlined
-                className="mb-10"
-                 onClick={()=>{
-                            setTestcases([...testcases,{input: ""}]);
-                            console.log(testcases)
-                        }} />
                 </div>
             }
         </div>
