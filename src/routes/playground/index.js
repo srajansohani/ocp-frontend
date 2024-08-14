@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Editor } from "@monaco-editor/react";
 import { Button, Select, Spin } from "antd";
-import { TestCaseContainer } from "./TestCaseContainer";
 import TextArea from "antd/es/input/TextArea";
-import { initPanelComponentToken } from "antd/es/date-picker/style";
 
 export const Playground = () => {
     const [code, setCode] = useState("");
