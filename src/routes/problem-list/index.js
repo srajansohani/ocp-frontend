@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { List, Space } from "antd";
 import axios from "axios";
-import { LikeOutlined, MessageOutlined, StarOutlined } from "@ant-design/icons";
+import {
+    LikeOutlined,
+    MessageOutlined,
+    StarOutlined,
+    TagsFilled,
+    TrophyFilled,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
 const IconText = ({ icon, text }) => (
@@ -13,7 +19,7 @@ const IconText = ({ icon, text }) => (
 
 export const ProblemList = () => {
     const [problems, setProblems] = useState();
-    const [isResult,setIsResult] = useState();
+    const [isResult, setIsResult] = useState();
     let navigate = useNavigate();
 
     const fetchProblems = async () => {
@@ -30,7 +36,7 @@ export const ProblemList = () => {
     };
 
     return (
-        <>
+        <div className="p-10">
             <List
                 itemLayout="vertical"
                 size="large"
@@ -44,27 +50,27 @@ export const ProblemList = () => {
                 renderItem={(item) => (
                     <List.Item
                         onClick={() => redirectToProblem(item._id)}
-                        key={item.title}
+                        key={item._id}
                         actions={[
                             <IconText
-                                icon={StarOutlined}
-                                text="156"
-                                key="list-vertical-star-o"
-                            />,
-                            <IconText
                                 icon={LikeOutlined}
-                                text="156"
+                                text={item.likes}
                                 key="list-vertical-like-o"
                             />,
                             <IconText
-                                icon={MessageOutlined}
-                                text="2"
-                                key="list-vertical-message"
+                                icon={TrophyFilled}
+                                text={item.difficulty}
+                                key="list-vertical-like-o"
+                            />,
+                            <IconText
+                                icon={TagsFilled}
+                                text={item.tags}
+                                key="list-vertical-like-o"
                             />,
                         ]}
                         extra={
                             <img
-                                width={272}
+                                width={170}
                                 alt="logo"
                                 src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
                             />
@@ -77,6 +83,6 @@ export const ProblemList = () => {
                     </List.Item>
                 )}
             />
-        </>
+        </div>
     );
 };
