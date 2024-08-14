@@ -1,99 +1,133 @@
-import React from "react";
-import { Button, Input,Segmented,Tooltip } from "antd";
+import React, { useEffect } from "react";
+import { Button, Input, Segmented, Tooltip } from "antd";
 import { useState } from "react";
-import {MinusCircleOutlined, PlusCircleOutlined} from '@ant-design/icons'
+import { CloseOutlined, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import TextArea from "antd/es/input/TextArea";
 
-class Testcase {
-     input
-     expected_output
-     isHidden = false
-     score=0
 
-     Testcase(input,expected_output=null,isHidden=false,score=0){
-        this.input = input;
-        this.expected_output = expected_output;
-        this.isHidden = isHidden
-        this.score=0
-     }
-}
-export const TestCaseContainer = ({segment,setSegment,results,testcases,setTestcases})=>{
-        
-        console.log(testcases);
-        return <>
+export const TestCaseContainer = ({ setIsResult, segment, isResult, setSegment, testcases, setTestcases }) => {
+
+    const handleRemoveTestCase = (index) => {
+        const updatedTestCases = testcases.filter((_, i) => i !== index);
+        setTestcases(updatedTestCases);
+    };
+    useEffect(()=>{
+        testcases.forEach((element,index) => {
+            if(element._id === currentTestCase._id){
+                setCurrentTestCase(element);
+            }
+        });
+    },[isResult])
+    const renderSegmentLabel = (tc, index) => (
+        <span className="flex items-center">
+            Test Case {index + 1}
+           {(segment === 'Testcase') && <CloseOutlined
+                onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveTestCase(index);
+                }}
+                className="hover:h-2 w-2 mb-5 ml-3"
+            />}
+        </span>
+    );
+
+    console.log(testcases);
+
+    const [currentTestCase, setCurrentTestCase] = useState({});
+
+    useEffect(()=>{
+        if(testcases.length > 0){
+            setCurrentTestCase(testcases[0]);
+        }
+    },[])
+    return <>
         <div>
             <div className="mb-0 flex flex-row">
-                <Segmented 
-                    options={['Testcase','Testresult']}
+                <Segmented
+                    options={['Testcase', 'Testresult']}
                     value={segment}
-                    onChange={(value)=>{setSegment(value)}}
+                    onChange={(value) => {
+                        setSegment(value);
+                    }}
                 />
             </div>
-            {(segment === "Testcase") ? 
-            
-            <div className="mb-0 flex flex-row">
-                <div className="mb-0 flex flex-row">
-                {
-                    (testcases) && testcases.map((testcase,index)=>{
-                        return (
-                            <div>
-                                <div>
-                                    Case {index}
-                                </div>
-                                <Input 
-                                    id={index}
-                                    value={testcase.input}
-                                    onChange={(value)=>{
-                                        const tests = [...testcases];
-                                        tests[index].input = value?.input;
-                                        setTestcases([...tests]);
-                                    }}
-                                    
-                                    suffix={
-                                        <Tooltip title="Extra information">
-                                          <MinusCircleOutlined 
-                                          onClick={()=>{
-                                            const newArray = [...testcases];
-                                            newArray.splice(index, 1);
-                                            setTestcases(newArray);
+            <div className="mb-5">
+                {testcases && <Segmented
+                    options={[
+                        ...testcases.map((testcase, index) => {
+                            return {
+                                label: (
+                                    renderSegmentLabel(testcase, index)
+                                ),
+                                value: testcase
+                            }
+                        })
+                    ]}
+                    onChange={(value) => {
+                        setCurrentTestCase(value)
+                    }}
+                />}
+                {((segment === 'Testcase')) && <PlusCircleOutlined onClick={() => {
+                    setTestcases([...testcases, {
+                        ...testcases[testcases.length - 1],
+                    }])
+                }} />}
+            </div>
+            {(currentTestCase) &&
 
-                                          }}
-                                           style={{ color: 'rgba(0,0,0,.45)' }} />
-                                        </Tooltip>
-                                      }
-                                />
-                            </div>
-                        )
-                    })
-                }
-                </div>
-                <PlusCircleOutlined
-                className="mb-10"
-                 onClick={()=>{
-                            setTestcases([...testcases,{input: ""}]);
-                            console.log(testcases)
-                        }} />
-                </div>
-            : 
-            <div className="mb-0 flex flex-row">
-                <div className="mb-0 flex flex-row">
-                {
-                    (testcases) && testcases.map((testcase,index)=>{
-                        return (
+                <div>
+                    <div className=" mb-2 h-80">
+                        {(segment === 'Testresult') ?
+                        <div>
+                            <p>Output:</p> 
+                            <Input 
+                                value={currentTestCase?.test_case?.output ? atob(currentTestCase?.test_case?.output) : " "}
+                                contentEditable={false}
+                            />
+
                             <div>
-                                <div onClick={()=>{}}>
-                                    Case {index}
-                                </div>
-                                <TextArea contentEditable={false} value={index < results.length ? atob(results[index]): ""} />
+                            <p>Expected_</p>
+                            <Input 
+                                value={currentTestCase?.test_case?.expected_output ? atob(currentTestCase?.test_case?.expected_output) : " "}
+                                contentEditable={false}
+                            />
                             </div>
-                        )
-                    })
-                }
-                </div>
-                </div>
-            }
+                            </div>
+                            
+                            
+                            : 
+                        
+
+                        <p>Input: <Input
+                            value={currentTestCase?.test_case?.input ? atob(currentTestCase?.test_case?.input) : " "}
+                            onChange={async(event)=>{
+                                console.log(event.target.value)
+                                setCurrentTestCase({
+                                    ...currentTestCase,
+                                    test_case: {
+                                        ...currentTestCase.test_case,
+                                        input: btoa(event.target.value)
+                                    }
+                                })
+                                setTestcases([...testcases.map((testcase,index)=>{
+                                    if(testcase._id === currentTestCase._id){
+                                        return {
+                                            ...currentTestCase,
+                                            test_case: {
+                                                ...currentTestCase.test_case,
+                                                input: btoa(event.target.value)
+                                            }
+                                        };
+                                    }
+                                    return testcase;
+                                })])
+                            }}
+                        />{}</p>}
+                    </div>
+
+                </div>}
         </div>
-        </>
+    </>
 }
 
 {/* <div className="shadow-md border-solid">

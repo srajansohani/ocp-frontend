@@ -13,6 +13,7 @@ const IconText = ({ icon, text }) => (
 
 export const ProblemList = () => {
     const [problems, setProblems] = useState();
+    const [isResult,setIsResult] = useState();
     let navigate = useNavigate();
 
     const fetchProblems = async () => {
@@ -25,7 +26,6 @@ export const ProblemList = () => {
     }, []);
 
     const redirectToProblem = (problem_id) => {
-        // console.log(problem_id);
         navigate(`/problem?problem_id=${problem_id}`);
     };
 
