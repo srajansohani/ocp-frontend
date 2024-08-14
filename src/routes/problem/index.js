@@ -2,9 +2,9 @@ import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProblemComponent from "../../components/ProblemComponent";
-import { Editor } from "@monaco-editor/react";
+import { Editor, loader } from "@monaco-editor/react";
 import { TestCaseContainer } from "../playground/TestCaseContainer";
-import { Select,Button, Input } from "antd";
+import { Select,Button, Input, Spin } from "antd";
 
 export const Problem = () => {
     const [problem, setProblem] = useState();
@@ -14,6 +14,7 @@ export const Problem = () => {
     const [testcases, setTestcases] = useState([]);
     const [isResult,setIsResult] = useState(false);
     const [segment,setSegment] = useState('Testcase');
+    const[loading,setLoading] = useState(false);
     const intervalRef  = useRef(null)
 
     const check = async (id) => {
@@ -25,7 +26,9 @@ export const Problem = () => {
             if (data?.status === "submitted") {
                 // console.log(data);
                 clearInterval(intervalRef.current);
+                setTestcases([...data?.test_cases])
                 setIsResult(true);
+                setLoading(false);
                 setSegment('Testresult');
             }
         }
@@ -56,6 +59,7 @@ export const Problem = () => {
         const data = await res.json();
         console.log(data);
         intervalRef.current = setInterval(() => check(data._id), 5000);
+        setLoading(true);
     }
 
     const fetchProblem = async (problem_id) => {
@@ -63,6 +67,7 @@ export const Problem = () => {
             `http://localhost:8000/problem?problem_id=${problem_id}`
         );
         setProblem(res.data);
+        console.log(res.data);
         setTestcases([...res.data.testcases.map((testcase)=>({
             test_case: {
                 input: testcase?.input,
@@ -115,7 +120,12 @@ export const Problem = () => {
                         }}
                     />
                   <div className="bg-white border border-gray-300 rounded-lg shadow-lg space-y-6">
-                    <TestCaseContainer setIsResult={setIsResult} testcases={testcases} setSegment={setSegment} setTestcases={setTestcases} isResult={isResult}/>
+                    {
+                    loading ? <Spin/>: <>{problem && <TestCaseContainer setIsResult={setIsResult} testcases={testcases} setSegment={setSegment} setTestcases={setTestcases} isResult={isResult} segment={segment}/>}</>
+                    
+                    
+                    }
+                    
                   </div>
                 </div>
             </div>
