@@ -6,6 +6,7 @@ import { Editor, loader } from "@monaco-editor/react";
 import { TestCaseContainer } from "../../components/TestCaseContainer";
 import { Select, Button, Input, Spin } from "antd";
 import { CODE_STUBS } from "../../utils/constants";
+import axiosInstance from "../../utils/axiosConfig";
 
 export const Problem = () => {
     const [problem, setProblem] = useState();
@@ -24,10 +25,10 @@ export const Problem = () => {
     },[language])
     const check = async (id) => {
         try {
-            const res = await fetch(
-                `http://localhost:8000/submission?sumbission_id=${id}&type=problem_submission`
+            const res = await axiosInstance.get(
+                `/submission?submission_id=${id}&type=problem_submission`
             );
-            const data = await res.json();
+            const data = res.data;
             console.log(data);
             if (data?.status === "submitted") {
                 clearInterval(intervalRef.current);
@@ -51,23 +52,17 @@ export const Problem = () => {
             test_cases: testcases,
         };
         console.log(submission);
-
-        const res = await fetch("http://localhost:8000/submission", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(submission),
-        });
-        const data = await res.json();
+        axiosInstance.post('/abc')
+        const res = await axiosInstance.post("http://localhost:8000/submission",submission);
+        const data = res.data;
         console.log(data);
         intervalRef.current = setInterval(() => check(data._id), 5000);
         setLoading(true);
     };
 
     const fetchProblem = async (problem_id) => {
-        const res = await axios.get(
-            `http://localhost:8000/problem?problem_id=${problem_id}`
+        const res = await axiosInstance.get(
+            `/problem?problem_id=${problem_id}`
         );
         setProblem(res.data);
 

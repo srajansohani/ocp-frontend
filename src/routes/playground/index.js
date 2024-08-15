@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Editor } from "@monaco-editor/react";
-import { Button, Select, Spin } from "antd";
+import { Button, message, Select, Spin } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { CODE_STUBS } from "../../utils/constants";
+import axiosInstance from "../../utils/axiosConfig";
 
 export const Playground = () => {
     const [code, setCode] = useState("");
@@ -12,12 +13,21 @@ export const Playground = () => {
     const [loader, setLoader] = useState(false);
 
     const intervalRef = useRef(null);
+    const deleteSubmission = async(id)=>{
+        try {
+            const res = await axiosInstance.delete(`/submission/playground?submission_id=${id}`);
+            console.log(res.data.message);
+        }
+        catch(error){
+            message.error(error.message);
+        }
+    }
     const check = async (id) => {
         try {
-            const res = await fetch(
-                `http://localhost:8000/submission?sumbission_id=${id}&type=playground_submission`
+            const res = await axiosInstance.get(
+                `/submission?submission_id=${id}&type=playground_submission`
             );
-            const data = await res.json();
+            const data = res.data;
             if (data?.status !== "pending") {
                 clearInterval(intervalRef.current);
 
@@ -31,6 +41,7 @@ export const Playground = () => {
                 const decoded_output = atob(data?.output);
                 setLoader(false);
                 setOutput(decoded_output);
+                deleteSubmission(id);
             }
         } catch (error) {
             console.log(error);
@@ -51,14 +62,8 @@ export const Playground = () => {
         };
         console.log(submission);
 
-        const res = await fetch("http://localhost:8000/submission/playground", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(submission),
-        });
-        const data = await res.json();
+        const res = await axiosInstance.post("/submission/playground", submission);
+        const data = res.data;
         setLoader(true);
         intervalRef.current = setInterval(() => check(data._id), 500);
     };

@@ -9,57 +9,66 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { store } from "../redux/store";
 import axiosInstance from "../utils/axiosConfig";
-import { message } from "antd";
+import { message, Spin } from "antd";
 import { addUserId, authenticate } from "../redux/userSlice";
 
 //Add all routes here
 function MainApp() {
-    const isAuthenticated = useSelector((store)=>store.user.isAuthenticated);
+    const [loader, setLoader] = useState(true);
+    const isAuthenticated = useSelector((store) => store.user.isAuthenticated);
     const dispatch = useDispatch();
-    const verifyUser = async()=>{
-        try{
+    const verifyUser = async () => {
+        try {
+            setLoader(true);
             const res = await axiosInstance.get('/user');
             dispatch(authenticate());
             dispatch(addUserId(res.data.user_id));
+            setLoader(false);
             console.log(res.data);
         }
-        catch(error){
+        catch (error) {
             message.error(error.message);
+            setLoader(false);
         }
     }
-    useEffect(()=>{
-        if(window.localStorage.token){
+    useEffect(() => {
+        if (window.localStorage.token) {
             verifyUser();
-        }   
-    },[])
+        }
+        else{
+            setLoader(false);
+        }
+    }, [])
     return (
         <div className="App">
-            <Routes>
+            {(loader) ? <Spin /> : <Routes>
                 <Route element={(
                     isAuthenticated ? <Outlet /> : <Navigate to="/auth/login" />
                 )}>
-                     <Route path="/" element={<Home />} />
-                     <Route path="/problem" element={<Problem />} />
-                     <Route path="/problems" element={<ProblemList />} />
-                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="/problem" element={<Problem />} />
+                    <Route path="/problems" element={<ProblemList />} />
+                    <Route path="/profile" element={<Profile />} />
                 </Route>
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/playground" element={<Playground />} />
-                <Route path="/auth/signup" element={<SignUp /> } />
-                <Route path="/auth/login" element={<Login isAuthenticated={isAuthenticated}/>}  />
+                <Route path="/auth/signup" element={<SignUp />} />
+                <Route path="/auth/login" element={<Login isAuthenticated={isAuthenticated} />} />
             </Routes>
+
+            }
         </div>
     );
 }
 
 function Home() {
-    const userId = useSelector((store)=>{
+    const userId = useSelector((store) => {
         console.log(store);
     })
-    useEffect(()=>{
+    useEffect(() => {
 
-    },[])
+    }, [])
     return <h2>Home</h2>;
 }
 

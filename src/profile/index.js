@@ -5,6 +5,7 @@ import { PieChart } from 'react-minimal-pie-chart';
 import UserProblemDistribution from '../components/UserProblemDistribution';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../utils/axiosConfig';
 
 function Profile() {
     const [userData,setUserData] = useState({});
@@ -16,7 +17,7 @@ function Profile() {
     const [segment,setSegment] = useState('')
     let navigate = useNavigate();
     const getUserData =async()=>{
-        const res = await axios.get('http://localhost:8000/user/profile?user_id=66bcf04ac3cbf0e5278ce078');
+        const res = await axiosInstance.get('user/profile?user_id=66bcf04ac3cbf0e5278ce078');
         setUserData(res.data.user);
         setProblemCount(res.data.metrics.problem_count);
     }

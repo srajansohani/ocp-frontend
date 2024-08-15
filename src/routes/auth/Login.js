@@ -15,9 +15,7 @@ const Login = ({isAuthenticated}) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     useEffect(()=>{
-        if(isAuthenticated){
-            navigate('/problems');
-        }
+        if(isAuthenticated){navigate('/')}
     },[isAuthenticated])
   const onFinish = async (values) => {
     try {
