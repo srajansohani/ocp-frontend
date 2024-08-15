@@ -5,17 +5,23 @@ import ProblemComponent from "../../components/ProblemComponent";
 import { Editor, loader } from "@monaco-editor/react";
 import { TestCaseContainer } from "../../components/TestCaseContainer";
 import { Select, Button, Input, Spin } from "antd";
+import { CODE_STUBS } from "../../utils/constants";
 
 export const Problem = () => {
     const [problem, setProblem] = useState();
     const [searchParams, setSearchParams] = useSearchParams();
-    const [language, setLanguage] = useState("");
+    const [language, setLanguage] = useState("cpp");
     const [code, setCode] = useState("");
     const [testcases, setTestcases] = useState([]);
     const [segment, setSegment] = useState("Testcase");
     const [loading, setLoading] = useState(false);
     const intervalRef = useRef(null);
 
+    useEffect(()=>{
+        if(code.length === 0){
+            setCode(CODE_STUBS[language])
+        }
+    },[language])
     const check = async (id) => {
         try {
             const res = await fetch(

@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { Editor } from "@monaco-editor/react";
 import { Button, Select, Spin } from "antd";
 import TextArea from "antd/es/input/TextArea";
+import { CODE_STUBS } from "../../utils/constants";
 
 export const Playground = () => {
     const [code, setCode] = useState("");
-    const [language, setLanguage] = useState();
+    const [language, setLanguage] = useState('cpp');
     const [output, setOutput] = useState("");
     const [input, setInput] = useState("");
     const [loader, setLoader] = useState(false);
@@ -35,6 +36,11 @@ export const Playground = () => {
             console.log(error);
         }
     };
+    useEffect(()=>{
+        if(code.length === 0){
+            setCode(CODE_STUBS[language])
+        }
+    },[language])
     const onRun = async () => {
         const encoded_code = btoa(code);
         const encoded_input = btoa(input);

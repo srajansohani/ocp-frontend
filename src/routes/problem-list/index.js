@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { List, Space } from "antd";
+import { List, message, Space } from "antd";
 import axios from "axios";
 import {
     LikeOutlined,
@@ -9,6 +9,7 @@ import {
     TrophyFilled,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../utils/axiosConfig";
 
 const IconText = ({ icon, text }) => (
     <Space>
@@ -23,8 +24,13 @@ export const ProblemList = () => {
     let navigate = useNavigate();
 
     const fetchProblems = async () => {
-        const res = await axios.get("http://localhost:8000/problem/all");
-        setProblems(res.data);
+        try{
+            const res = await axiosInstance.get("http://localhost:8000/problem/all");
+            setProblems(res.data);
+        }
+        catch(err){
+            message.error(err.message);
+        }
     };
 
     useEffect(() => {

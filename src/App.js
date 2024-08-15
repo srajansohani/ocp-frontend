@@ -1,17 +1,24 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import MainApp from "./routes";
 import { useDispatch, useSelector } from "react-redux";
 import { increment, incrementByAmount } from "./redux/counter/counterSlice";
 import { Navbar } from "./components/Navbar";
+import { useEffect,useState } from "react";
+import axiosInstance from "./utils/axiosConfig";
 function App() {
     //Example for redux (to remove)
-    const count = useSelector((store) => store.counter.value);
-    const dispatch = useDispatch();
-    console.log(count);
+    const [isAuthenticated,setIsAuthenticated] = useState(false);
+    useEffect(()=>{
+        if(window.localStorage.token){
+            setIsAuthenticated(true);
+        }
+    },[])
+
+
     return (
         <>
             <Navbar />
-            <MainApp />
+            <MainApp isAuthenticated={isAuthenticated} />
             {/* <button onClick={()=>{dispatch(incrementByAmount(3))}}>
       increment
     </button>
