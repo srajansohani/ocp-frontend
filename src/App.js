@@ -2,23 +2,18 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import MainApp from "./routes";
 import { useDispatch, useSelector } from "react-redux";
 import { increment, incrementByAmount } from "./redux/counter/counterSlice";
-import { Navbar } from "./components/Navbar";
 import { useEffect,useState } from "react";
 import axiosInstance from "./utils/axiosConfig";
+import {Navbar} from "./components/Navbar/index"
 function App() {
     //Example for redux (to remove)
-    const [isAuthenticated,setIsAuthenticated] = useState(false);
-    useEffect(()=>{
-        if(window.localStorage.token){
-            setIsAuthenticated(true);
-        }
-    },[])
-
 
     return (
         <>
             <Navbar />
-            <MainApp isAuthenticated={isAuthenticated} />
+            <main className="pt-16">
+            <MainApp />
+            </main>
             {/* <button onClick={()=>{dispatch(incrementByAmount(3))}}>
       increment
     </button>
