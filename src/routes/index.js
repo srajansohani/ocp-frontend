@@ -2,7 +2,7 @@ import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { Playground } from "./playground";
 import { ProblemList } from "./problem-list";
 import { Problem } from "./problem";
-import Profile from "../profile";
+import Profile from "./profile";
 import SignUp from "./auth/SignUp";
 import Login from "./auth/Login";
 import { useEffect, useState } from "react";
@@ -20,44 +20,53 @@ function MainApp() {
     const verifyUser = async () => {
         try {
             setLoader(true);
-            const res = await axiosInstance.get('/user');
+            const res = await axiosInstance.get("/user");
             dispatch(authenticate());
             dispatch(addUserId(res.data.user_id));
             setLoader(false);
             console.log(res.data);
-        }
-        catch (error) {
+        } catch (error) {
             message.error(error.message);
             setLoader(false);
         }
-    }
+    };
     useEffect(() => {
         if (window.localStorage.token) {
             verifyUser();
-        }
-        else{
+        } else {
             setLoader(false);
         }
-    }, [])
+    }, []);
     return (
         <div className="App">
-            {(loader) ? <Spin /> : <Routes>
-                <Route element={(
-                    isAuthenticated ? <Outlet /> : <Navigate to="/auth/login" />
-                )}>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/problem" element={<Problem />} />
-                    <Route path="/problems" element={<ProblemList />} />
-                    <Route path="/profile" element={<Profile />} />
-                </Route>
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/playground" element={<Playground />} />
-                <Route path="/auth/signup" element={<SignUp />} />
-                <Route path="/auth/login" element={<Login isAuthenticated={isAuthenticated} />} />
-            </Routes>
-
-            }
+            {loader ? (
+                <Spin />
+            ) : (
+                <Routes>
+                    <Route
+                        element={
+                            isAuthenticated ? (
+                                <Outlet />
+                            ) : (
+                                <Navigate to="/auth/login" />
+                            )
+                        }
+                    >
+                        <Route path="/" element={<Home />} />
+                        <Route path="/problem" element={<Problem />} />
+                        <Route path="/problems" element={<ProblemList />} />
+                        <Route path="/profile" element={<Profile />} />
+                    </Route>
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/playground" element={<Playground />} />
+                    <Route path="/auth/signup" element={<SignUp />} />
+                    <Route
+                        path="/auth/login"
+                        element={<Login isAuthenticated={isAuthenticated} />}
+                    />
+                </Routes>
+            )}
         </div>
     );
 }
@@ -65,10 +74,8 @@ function MainApp() {
 function Home() {
     const userId = useSelector((store) => {
         console.log(store);
-    })
-    useEffect(() => {
-
-    }, [])
+    });
+    useEffect(() => {}, []);
     return <h2>Home</h2>;
 }
 

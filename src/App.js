@@ -2,9 +2,9 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import MainApp from "./routes";
 import { useDispatch, useSelector } from "react-redux";
 import { increment, incrementByAmount } from "./redux/counter/counterSlice";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "./utils/axiosConfig";
-import {Navbar} from "./components/Navbar/index"
+import { Navbar } from "./components/Navbar/index";
 function App() {
     //Example for redux (to remove)
 
@@ -12,7 +12,7 @@ function App() {
         <>
             <Navbar />
             <main className="pt-16">
-            <MainApp />
+                <MainApp />
             </main>
             {/* <button onClick={()=>{dispatch(incrementByAmount(3))}}>
       increment

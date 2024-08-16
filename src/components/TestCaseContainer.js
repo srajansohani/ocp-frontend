@@ -1,18 +1,16 @@
+import React, { useEffect } from "react";
 import { Input, Segmented } from "antd";
 import { CloseOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import Title from "antd/es/typography/Title";
-
-import React from "react";
-import { Typography } from "antd";
-
-const { Text } = Typography;
+import Text from "antd/es/typography/Text";
+import TextArea from "antd/es/input/TextArea";
 
 export const TestCaseContainer = ({
     segment,
     setSegment,
     testcases,
     setTestcases,
+    submissionError,
 }) => {
     const [index, setIndex] = useState(0);
 
@@ -27,19 +25,23 @@ export const TestCaseContainer = ({
         console.log("display a toast to say cant remove all testcases");
     };
 
+    useEffect(() => {
+        console.log(testcases);
+    }, [testcases]);
+
     const renderSegmentLabel = (tc, tcIndex) => (
-        <span className="flex items-center" onClick={() => setIndex(index)}>
-            Test Case {tcIndex + 1}
+        <div className="py-2 px-4 relative">
+            <Text onClick={() => setIndex(index)}>Test Case {tcIndex + 1}</Text>
             {segment === "Testcase" && (
                 <CloseOutlined
                     onClick={(e) => {
                         e.stopPropagation();
                         handleRemoveTestCase(tcIndex);
                     }}
-                    className="hover:h-2 w-2 mb-5 ml-3"
+                    className="absolute w-3 h-3 p-0.5 rounded-full top-1 right-[-4px] hover:bg-[#8a8a8a]  hover:text-white"
                 />
             )}
-        </span>
+        </div>
     );
 
     const changeTestCase = async (event) => {
@@ -65,84 +67,111 @@ export const TestCaseContainer = ({
     };
 
     return (
-        <div className="p-4">
+        <div className="p-8">
             <div className="mb-0 flex flex-row">
                 <Segmented
-                    options={
-                        testcases[0].test_case.output
-                            ? ["Testcase", "Testresult"]
-                            : ["Testcase"]
-                    }
+                    options={["Testcase", "Testresult"]}
                     value={segment}
                     onChange={(value) => {
                         setSegment(value);
                     }}
                 />
             </div>
-            <div className="mb-5 mt-0">
-                {testcases && (
-                    <Segmented
-                        options={[
-                            ...testcases.map((testcase, index) => {
-                                return {
-                                    label: renderSegmentLabel(testcase, index),
-                                    value: index,
-                                    // key: index,
-                                };
-                            }),
-                        ]}
-                        onChange={(value) => {
-                            setIndex(value);
-                        }}
-                    />
-                )}
-                {segment === "Testcase" && (
-                    <PlusCircleOutlined
-                        onClick={() => {
-                            setTestcases([
-                                ...testcases,
-                                {
-                                    test_case: {
-                                        input: "",
-                                        expected_output: "",
+            {!testcases[index].test_case.output && segment === "Testresult" ? (
+                <></>
+            ) : (
+                <div className="mb-5 mt-0">
+                    {testcases && (
+                        <Segmented
+                            options={[
+                                ...testcases.map((testcase, index) => {
+                                    return {
+                                        label: renderSegmentLabel(
+                                            testcase,
+                                            index
+                                        ),
+                                        value: index,
+                                        // key: index,
+                                    };
+                                }),
+                            ]}
+                            onChange={(value) => {
+                                setIndex(value);
+                            }}
+                        />
+                    )}
+                    {segment === "Testcase" && (
+                        <PlusCircleOutlined
+                            onClick={() => {
+                                setTestcases([
+                                    ...testcases,
+                                    {
+                                        test_case: {
+                                            input: "",
+                                            expected_output: "",
+                                        },
                                     },
-                                },
-                            ]);
-                        }}
-                    />
-                )}
-            </div>
+                                ]);
+                            }}
+                        />
+                    )}
+                </div>
+            )}
             {testcases && (
                 <>
                     {segment === "Testresult" ? (
-                        <>
-                            <Text>{"Output :"}</Text>
-                            <Input
-                                value={atob(testcases[index].test_case.output)}
-                                contentEditable={false}
-                                className="mb-5"
-                            />
-                            <Text>{"Expected Output :"}</Text>
-                            <Input
-                                value={atob(
-                                    testcases[index].test_case.expected_output
-                                )}
-                                contentEditable={false}
-                            />
-                        </>
+                        submissionError ? (
+                            <div className="flex w-full h-full justify-center align-middle p-4">
+                                <TextArea
+                                    rows={8}
+                                    disabled={true}
+                                    style={{ color: "#000" }}
+                                    value={submissionError}
+                                />
+                            </div>
+                        ) : testcases[index].test_case.output ? (
+                            <>
+                                <Text>{"Output :"}</Text>
+                                <TextArea
+                                    value={atob(
+                                        testcases[index].test_case.output
+                                    )}
+                                    contentEditable={false}
+                                    className="mb-5"
+                                    style={{ padding: "0.5rem" }}
+                                />
+                                <Text>{"Expected Output :"}</Text>
+                                <TextArea
+                                    value={atob(
+                                        testcases[index].test_case
+                                            .expected_output
+                                    )}
+                                    contentEditable={false}
+                                    style={{ padding: "0.5rem" }}
+                                />
+                            </>
+                        ) : (
+                            <div className="flex w-full h-full justify-center align-middle p-8">
+                                <Text>
+                                    You need run/submit before you can view the
+                                    results
+                                </Text>
+                            </div>
+                        )
                     ) : (
                         <>
                             <Text>{"Input :"}</Text>
-                            <Input
+                            <TextArea
                                 name="input"
                                 value={atob(testcases[index].test_case.input)}
                                 onChange={(event) => {
                                     changeTestCase(event);
                                 }}
                                 className="mb-5"
+                                style={{ padding: "0.5rem" }}
                             />
                             <Text>{"Expected Output :"}</Text>
-                            <Input
+                            <TextArea
                                 name="expected_output"
                                 value={atob(
                                     testcases[index].test_case.expected_output
@@ -150,6 +179,7 @@ export const TestCaseContainer = ({
                                 onChange={(event) => {
                                     changeTestCase(event);
                                 }}
+                                style={{ padding: "0.5rem" }}
                             />
                         </>
                     )}

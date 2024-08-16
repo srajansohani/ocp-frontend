@@ -24,11 +24,12 @@ export const ProblemList = () => {
     let navigate = useNavigate();
 
     const fetchProblems = async () => {
-        try{
-            const res = await axiosInstance.get("http://localhost:8000/problem/all");
+        try {
+            const res = await axiosInstance.get(
+                "http://localhost:8000/problem/all"
+            );
             setProblems(res.data);
-        }
-        catch(err){
+        } catch (err) {
             message.error(err.message);
         }
     };

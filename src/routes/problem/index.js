@@ -1,12 +1,13 @@
-import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProblemComponent from "../../components/ProblemComponent";
 import { Editor, loader } from "@monaco-editor/react";
 import { TestCaseContainer } from "../../components/TestCaseContainer";
-import { Select, Button, Input, Spin } from "antd";
+import { Select, Button, Input, Spin, Space, message } from "antd";
 import { CODE_STUBS } from "../../utils/constants";
 import axiosInstance from "../../utils/axiosConfig";
+import { LoadingOutlined } from "@ant-design/icons";
+import Text from "antd/es/typography/Text";
 
 export const Problem = () => {
     const [problem, setProblem] = useState();
@@ -16,47 +17,132 @@ export const Problem = () => {
     const [testcases, setTestcases] = useState([]);
     const [segment, setSegment] = useState("Testcase");
     const [loading, setLoading] = useState(false);
+    const [submissionError, setSbumissionError] = useState(undefined);
     const intervalRef = useRef(null);
 
-    useEffect(()=>{
-        if(code.length === 0){
-            setCode(CODE_STUBS[language])
+    useEffect(() => {
+        if (code.length === 0) {
+            setCode(CODE_STUBS[language]);
         }
-    },[language])
+    }, [language]);
+
+    const deleteThrowawaySubmission = async (submission_id) => {
+        try {
+            await axiosInstance.delete(
+                `/submission?submission_id=${submission_id}`
+            );
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     const check = async (id) => {
         try {
             const res = await axiosInstance.get(
                 `/submission?submission_id=${id}&type=problem_submission`
             );
             const data = res.data;
-            console.log(data);
-            if (data?.status === "submitted") {
+            // console.log(data);
+            if (data.status === "submitted") {
                 clearInterval(intervalRef.current);
-                setTestcases([...data?.test_cases]);
+                setSbumissionError(data.error);
+                setTestcases([...data.test_cases]);
                 setLoading(false);
                 setSegment("Testresult");
+
+                if (data.throwaway) {
+                    if (data.error) {
+                        message.error(
+                            `Your submission resulted in ${data.result}`,
+                            5
+                        );
+                    }
+                    deleteThrowawaySubmission(data._id);
+                    return;
+                }
+
+                if (data.error) {
+                    message.error(
+                        `Your submission resulted in ${data.result}`,
+                        5
+                    );
+                }
+
+                message.success(
+                    `You have succefully solved ${problem.title} !!`,
+                    5
+                );
             }
         } catch (error) {
             console.log(error);
         }
     };
 
+    const validateTestcases = () => {
+        let valid = true;
+        testcases.forEach((test_case, index) => {
+            console.log(test_case.test_case);
+            if (
+                !test_case.test_case.input.length ||
+                !test_case.test_case.expected_output.length
+            ) {
+                message.error(
+                    `Inupt or Expected-output cannot be empty in test case ${
+                        index + 1
+                    }`
+                );
+                valid = false;
+            }
+        });
+
+        return valid;
+    };
+
     const runCode = async () => {
+        if (!validateTestcases()) {
+            return;
+        }
         const encoded_code = btoa(code);
         const submission = {
             problem_id: searchParams.get("problem_id"),
-            user_id: "66b8b3bcf33aeaa14257f243",
             language: language,
             code: encoded_code,
             type: "run",
             test_cases: testcases,
         };
-        console.log(submission);
-        axiosInstance.post('/abc')
-        const res = await axiosInstance.post("http://localhost:8000/submission",submission);
+
+        const res = await axiosInstance.post(
+            "http://localhost:8000/submission",
+            submission
+        );
         const data = res.data;
-        console.log(data);
-        intervalRef.current = setInterval(() => check(data._id), 5000);
+        intervalRef.current = setInterval(
+            () => check(data.submission_id),
+            2000
+        );
+
+        setLoading(true);
+    };
+
+    const submitCode = async () => {
+        const encoded_code = btoa(code);
+        const submission = {
+            problem_id: searchParams.get("problem_id"),
+            language: language,
+            code: encoded_code,
+            type: "submit",
+        };
+
+        const res = await axiosInstance.post(
+            "http://localhost:8000/submission",
+            submission
+        );
+        const data = res.data;
+        intervalRef.current = setInterval(
+            () => check(data.submission_id),
+            2000
+        );
+
         setLoading(true);
     };
 
@@ -87,26 +173,36 @@ export const Problem = () => {
                     <ProblemComponent className="basis-1/2" problem={problem} />
                 </div>
                 <div className="basis-3/5">
-                    <div className="flex flex-row justify-between">
+                    <div className="flex flex-row justify-between  my-4 px-4">
                         <Select
                             placeholder="select a language"
                             options={[
-                                { value: "cpp", label: <span>C++</span> },
-                                { value: "java", label: <span>java</span> },
-                                { value: "python", label: <span>pyhton</span> },
+                                { value: "cpp", label: <Text>C++</Text> },
+                                { value: "java", label: <Text>java</Text> },
+                                { value: "python", label: <Text>pyhton</Text> },
                             ]}
                             value={language}
                             onSelect={(value) => {
                                 setLanguage(value);
                             }}
-                            className="mt-4 mb-3 w-40"
+                            className="w-40 justify-"
                         />
-                        <Button
-                            className="mt-4 mb-3 bg-blue-400 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300"
-                            onClick={runCode}
-                        >
-                            Run Code
-                        </Button>
+                        <Space>
+                            <Button
+                                className=" bg-[#1F2937] hover:bg-blue-600 text-white p-5 rounded-lg shadow-md transition duration-300"
+                                onClick={runCode}
+                                disabled={loading ? true : false}
+                            >
+                                Run Code
+                            </Button>
+                            <Button
+                                className=" bg-[#1F2937] hover:bg-blue-600 text-white p-5 rounded-lg shadow-md transition duration-300"
+                                onClick={submitCode}
+                                disabled={loading ? true : false}
+                            >
+                                Submit
+                            </Button>
+                        </Space>
                     </div>
                     <Editor
                         height="50vh"
@@ -120,20 +216,31 @@ export const Problem = () => {
                             setCode(value);
                         }}
                     />
-                    <div className="bg-white border border-gray-300 rounded-lg shadow-lg space-y-6">
-                        {loading ? (
-                            <Spin />
-                        ) : (
-                            <>
-                                {problem && (
-                                    <TestCaseContainer
-                                        segment={segment}
-                                        setSegment={setSegment}
-                                        setTestcases={setTestcases}
-                                        testcases={testcases}
-                                    />
-                                )}
-                            </>
+                    <div className="bg-white border border-gray-300 rounded-b-lg shadow-lg">
+                        {loading && (
+                            <div className="fixed h-screen w-screen bg-[#00000050] top-0 left-0 flex justify-center align-top z-10">
+                                <Spin
+                                    indicator={
+                                        <LoadingOutlined
+                                            style={{
+                                                fontSize: 78,
+                                                zIndex: 11,
+                                                top: "50%",
+                                            }}
+                                            spin
+                                        />
+                                    }
+                                />
+                            </div>
+                        )}
+                        {problem && (
+                            <TestCaseContainer
+                                segment={segment}
+                                setSegment={setSegment}
+                                setTestcases={setTestcases}
+                                testcases={testcases}
+                                submissionError={submissionError}
+                            />
                         )}
                     </div>
                 </div>
