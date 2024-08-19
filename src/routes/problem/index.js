@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import ProblemComponent from "../../components/ProblemComponent";
-import { Editor, loader } from "@monaco-editor/react";
-import { TestCaseContainer } from "../../components/TestCaseContainer";
-import { Select, Button, Input, Spin, Space, message } from "antd";
+import ProblemComponent from "./ProblemComponent";
+import { Editor } from "@monaco-editor/react";
+import { TestCaseContainer } from "./TestCaseContainer";
+import { Select, Button, Spin, Space, message } from "antd";
 import { CODE_STUBS } from "../../utils/constants";
 import axiosInstance from "../../utils/axiosConfig";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -42,7 +42,7 @@ export const Problem = () => {
                 `/submission?submission_id=${id}&type=problem_submission`
             );
             const data = res.data;
-            // console.log(data);
+
             if (data.status === "submitted") {
                 clearInterval(intervalRef.current);
                 setSbumissionError(data.error);
@@ -61,17 +61,15 @@ export const Problem = () => {
                     return;
                 }
 
-                if (data.error) {
-                    message.error(
-                        `Your submission resulted in ${data.result}`,
+                if (data.result === "AC") {
+                    message.success(
+                        `You have succefully solved ${problem.title} !!`,
                         5
                     );
+                    return;
                 }
 
-                message.success(
-                    `You have succefully solved ${problem.title} !!`,
-                    5
-                );
+                message.error(`Your submission resulted in ${data.result}`, 5);
             }
         } catch (error) {
             console.log(error);
@@ -132,11 +130,21 @@ export const Problem = () => {
             code: encoded_code,
             type: "submit",
         };
+        let res;
 
-        const res = await axiosInstance.post(
-            "http://localhost:8000/submission",
-            submission
-        );
+        if (searchParams.get("contest_id")) {
+            console.log("submit to contest TODO");
+            // res = await axiosInstance.post(
+            //     "http://localhost:8000/contest/submission",
+            //     submission
+            // );
+        } else {
+            res = await axiosInstance.post(
+                "http://localhost:8000/submission",
+                submission
+            );
+        }
+
         const data = res.data;
         intervalRef.current = setInterval(
             () => check(data.submission_id),

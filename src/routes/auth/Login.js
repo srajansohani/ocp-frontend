@@ -2,7 +2,6 @@
 
 import React, { useEffect } from "react";
 import { Form, Input, Button, Typography, message } from "antd";
-import axios from "axios";
 import axiosInstance from "../../utils/axiosConfig";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
