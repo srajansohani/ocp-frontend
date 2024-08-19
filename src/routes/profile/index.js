@@ -1,13 +1,13 @@
 import { Button, Divider, Flex, List, Segmented, Space, Table } from "antd";
 import React, { useState, useEffect } from "react";
-import ProblemDistributionChart from "../../components/ProblemDistributionChart";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
 import Title from "antd/es/typography/Title";
 import Paragraph from "antd/es/typography/Paragraph";
 import Text from "antd/es/typography/Text";
-import { Tag } from "../../components/Tag";
-import AccuracyChart from "../../components/AccuracyChart";
+import { Tag } from "./Tag";
+import AccuracyChart from "./AccuracyChart";
+import ProblemDistributionChart from "./ProblemDistributionChart";
 
 function Profile() {
     const [userData, setUserData] = useState({});

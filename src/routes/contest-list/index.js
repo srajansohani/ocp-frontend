@@ -12,26 +12,26 @@ const IconText = ({ icon, text }) => (
 );
 
 export const ProblemList = () => {
-    const [problems, setProblems] = useState();
+    const [contests, setContests] = useState();
     let navigate = useNavigate();
 
-    const fetchProblems = async () => {
-        try {
-            const res = await axiosInstance.get(
-                "http://localhost:8000/problem/all"
-            );
-            setProblems(res.data);
-        } catch (err) {
-            message.error(err.message);
-        }
-    };
+    // const fetchProblems = async () => {
+    //     try {
+    //         const res = await axiosInstance.get(
+    //             "http://localhost:8000/problem/all"
+    //         );
+    //         setProblems(res.data);
+    //     } catch (err) {
+    //         message.error(err.message);
+    //     }
+    // };
 
-    useEffect(() => {
-        fetchProblems();
-    }, []);
+    // useEffect(() => {
+    //     fetchProblems();
+    // }, []);
 
-    const redirectToProblem = (problem_id) => {
-        navigate(`/problem?problem_id=${problem_id}`);
+    const redirectToContest = (contest_id) => {
+        console.log("redirecting to contest");
     };
 
     return (
@@ -45,20 +45,15 @@ export const ProblemList = () => {
                     },
                     pageSize: 10,
                 }}
-                dataSource={problems}
+                dataSource={contests}
                 renderItem={(item) => (
                     <List.Item
-                        onClick={() => redirectToProblem(item._id)}
+                        onClick={() => redirectToContest(item._id)}
                         key={item._id}
                         actions={[
                             <IconText
                                 icon={LikeOutlined}
                                 text={item.likes}
-                                key="list-vertical-like-o"
-                            />,
-                            <IconText
-                                icon={TrophyFilled}
-                                text={item.difficulty}
                                 key="list-vertical-like-o"
                             />,
                             item.tags && (
