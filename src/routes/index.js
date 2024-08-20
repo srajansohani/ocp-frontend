@@ -11,6 +11,8 @@ import { store } from "../redux/store";
 import axiosInstance from "../utils/axiosConfig";
 import { message, Spin } from "antd";
 import { addUserId, authenticate } from "../redux/userSlice";
+import { ContestList } from "./contest-list";
+import { Contest } from "./contest";
 
 //Add all routes here
 function MainApp() {
@@ -59,6 +61,8 @@ function MainApp() {
                     </Route>
                     <Route path="/about" element={<About />} />
                     <Route path="/contact" element={<Contact />} />
+                    <Route path="/contests" element={<ContestList />} />
+                    <Route path="/contest"  element={<Contest />} />
                     <Route path="/playground" element={<Playground />} />
                     <Route path="/auth/signup" element={<SignUp />} />
                     <Route
