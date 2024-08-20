@@ -11,27 +11,27 @@ const IconText = ({ icon, text }) => (
     </Space>
 );
 
-export const ProblemList = () => {
+export const ContestList = () => {
     const [contests, setContests] = useState();
     let navigate = useNavigate();
 
-    // const fetchProblems = async () => {
-    //     try {
-    //         const res = await axiosInstance.get(
-    //             "http://localhost:8000/problem/all"
-    //         );
-    //         setProblems(res.data);
-    //     } catch (err) {
-    //         message.error(err.message);
-    //     }
-    // };
+    const getContests = async () => {
+        try {
+            const res = await axiosInstance.get(
+                "http://localhost:8000/contest/all"
+            );
+            setContests(res.data);
+        } catch (err) {
+            message.error(err.message);
+        }
+    };
 
-    // useEffect(() => {
-    //     fetchProblems();
-    // }, []);
+    useEffect(() => {
+        getContests();
+    }, []);
 
     const redirectToContest = (contest_id) => {
-        console.log("redirecting to contest");
+        navigate(`/contest?id=${contest_id}`);
     };
 
     return (

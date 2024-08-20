@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
-import { Flex, List, Space, Typography } from "antd";
+import { Checkbox, Flex, List, Space, Typography } from "antd";
 import Title from "antd/es/typography/Title";
 import { LeaderBoard } from "./LeaderBoard";
 import { LikeOutlined, TrophyFilled } from "@ant-design/icons";
+import { Table, Tag } from 'antd';
+import 'antd/dist/reset.css'; 
 
 const { Text } = Typography;
 
@@ -15,79 +17,94 @@ const IconText = ({ icon, text }) => (
     </Space>
 );
 
-export const Problem = () => {
+export const Contest = () => {
     const [contest, setContest] = useState();
     const [searchParams, setSearchParams] = useSearchParams();
+    const [problems,setProblems] = useState([]);
     const navigate = useNavigate();
 
     const fetchContest = async (contest_id) => {
-        // const res = await axiosInstance.get(
-        //     `/contest?problem_id=${contest_id}`
-        // );
-        // setContest(res.data);
+        const res = await axiosInstance.get(
+            `/contest?contest_id=${contest_id}`
+        );
+        setContest(res.data);
+        setProblems([...res.data.problems.map((p)=>({...p.problem,score: p.score, isSolved: false}))]);
     };
 
     useEffect(() => {
-        fetchContest(searchParams.get("contest_id"));
+        fetchContest(searchParams.get("id"));
     }, [searchParams]);
 
     const redirectToProblem = (problem_id) => {
         navigate(
-            `/problem?problem_id=${problem_id}&contest_id=${contest.contest_id}`
+            `/problem?problem_id=${problem_id}&contest_id=${contest._id}`
         );
     };
 
     return (
         <>
             {contest && (
-                <Flex className="p-10">
+                <>
                     <div>
                         <Title>{contest.title}</Title>
                         <Text>{contest.description}</Text>
-
-                        <List
-                            itemLayout="vertical"
-                            size="large"
-                            pagination={{
-                                onChange: (page) => {
-                                    console.log(page);
-                                },
-                                pageSize: 10,
-                            }}
-                            dataSource={contest.problems}
-                            renderItem={(item) => (
-                                <List.Item
-                                    onClick={() => redirectToProblem(item._id)}
-                                    key={item._id}
-                                    actions={[
-                                        <IconText
-                                            icon={LikeOutlined}
-                                            text={item.likes}
-                                            key="list-vertical-like-o"
-                                        />,
-                                        <IconText
-                                            icon={TrophyFilled}
-                                            text={item.difficulty}
-                                            key="list-vertical-like-o"
-                                        />,
-                                    ]}
-                                    extra={
-                                        <img
-                                            width={170}
-                                            alt="logo"
-                                            src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                                        />
-                                    }
-                                >
-                                    <List.Item.Meta title={item.title} />
-                                    {item.desc}
-                                </List.Item>
-                            )}
-                        />
                     </div>
+                    <ProblemListTable problems={problems}  redirectToProblem={redirectToProblem} />
                     <LeaderBoard contestId={contest.contest_id} />
-                </Flex>
+                </>
             )}
         </>
     );
 };
+
+
+function ProblemListTable({ problems,redirectToProblem }){
+    // Define columns for the table
+    const columns = [
+        {
+            title: 'Title',
+            dataIndex: 'title',
+            key: 'title',
+            render: (text,record)=><Space size="middle">
+            <p className=" cursor-pointer" onClick = {()=>{redirectToProblem(record._id)}}>{text}</p>
+        </Space>
+        },
+        {
+            title: 'Score',
+            dataIndex: 'score',
+            key: 'score',
+        },
+        {
+            title: 'Difficulty',
+            dataIndex: 'difficulty',
+            key: 'difficulty',
+            render: difficulty => (
+                <Tag color={difficulty === 'Easy' ? 'green' : difficulty === 'Medium' ? 'orange' : 'red'}>
+                    {difficulty}
+                </Tag>
+            ),
+        },
+        {
+            title: 'Solved',
+            key: 'isSolved',
+            render: (_, record) => (
+                <Checkbox checked={record.isSolved} disabled />
+            ),
+        },
+    ];
+
+    return (
+        <Table
+            columns={columns}
+            dataSource={problems}
+            rowKey="_id"
+            getContainerWidth={100}
+            pagination={false}
+            size="small"
+            className="w-9/12 ml-20 border-s-black"
+        />
+    );
+};
+
+export default ProblemListTable;
+
