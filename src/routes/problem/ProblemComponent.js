@@ -1,16 +1,56 @@
 import Title from "antd/es/typography/Title";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Space, Typography } from "antd";
-import { XFilled } from "@ant-design/icons";
+import { LikeFilled, LikeOutlined, XFilled } from "@ant-design/icons";
+import axiosInstance from "../../utils/axiosConfig";
 
 const { Text } = Typography;
 
 const ProblemComponent = ({ problem }) => {
+    console.log(problem);
+    const [liked, setLiked] = useState();
+
+    const fetchLikedProblems = async () => {
+        const res = await axiosInstance.get("http://localhost:8000/user/likes");
+        let liked = false;
+
+        res.data.liked_problems.forEach((problem_id) => {
+            if (problem_id === problem._id) {
+                liked = true;
+            }
+        });
+
+        setLiked(liked);
+    };
+
+    useEffect(() => {
+        if (problem) {
+            fetchLikedProblems();
+        }
+    }, [problem]);
+
+    const handleLike = async () => {
+        await axiosInstance.post("/problem/like", { problem_id: problem._id });
+        setLiked(true);
+    };
+
+    const handleUnLike = async () => {
+        await axiosInstance.post("/problem/remove-like", {
+            problem_id: problem._id,
+        });
+        setLiked(false);
+    };
+
     return (
         <>
             {problem && (
                 <div className="p-4">
                     <Title>{problem.title}</Title>
+                    <div
+                        onClick={() => (liked ? handleUnLike() : handleLike())}
+                    >
+                        {React.createElement(liked ? LikeFilled : LikeOutlined)}
+                    </div>
                     <Title level={5}>Description : </Title>
                     <Text>{problem.desc}</Text>
                     {problem.input_format && (
