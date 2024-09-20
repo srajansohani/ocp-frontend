@@ -21,6 +21,7 @@ export const Contest = () => {
     const [contest, setContest] = useState();
     const [searchParams, setSearchParams] = useSearchParams();
     const [problems,setProblems] = useState([]);
+    const [isUpcoming,setIsUpcoming] = useState(false);
     const navigate = useNavigate();
 
     const fetchContest = async (contest_id) => {
@@ -35,10 +36,29 @@ export const Contest = () => {
         fetchContest(searchParams.get("id"));
     }, [searchParams]);
 
+    useEffect(()=>{
+       
+        const startTime = new Date(contest?.start_time);
+        if(startTime > new Date()){
+            setIsUpcoming(true);
+        }
+        else{
+            setIsUpcoming(false);
+        }
+    },[contest])
+
     const redirectToProblem = (problem_id) => {
-        navigate(
-            `/problem?problem_id=${problem_id}&contest_id=${contest._id}`
-        );
+        const startTime = new Date(contest?.start_time);
+        const endTime = new Date(startTime.getTime() + contest.duration* 60 * 1000); 
+        if(new Date() > startTime && new Date() < endTime){
+            navigate(
+                `/problem?problem_id=${problem_id}&contest_id=${contest._id}`
+            );
+        }
+        else{
+            navigate(`/problem?problem_id=${problem_id}`)
+        }
+        
     };
 
     return (
@@ -49,8 +69,8 @@ export const Contest = () => {
                         <Title>{contest.title}</Title>
                         <Text>{contest.description}</Text>
                     </div>
-                    <ProblemListTable problems={problems}  redirectToProblem={redirectToProblem} />
-                    <LeaderBoard contestId={contest.contest_id} />
+                    <ProblemListTable  isUpcoming= {isUpcoming} problems={problems}  redirectToProblem={redirectToProblem} />
+                    <LeaderBoard isUpcoming={isUpcoming} contestId={contest.contest_id} />
                 </>
             )}
         </>
@@ -58,8 +78,8 @@ export const Contest = () => {
 };
 
 
-function ProblemListTable({ problems,redirectToProblem }){
-    // Define columns for the table
+function ProblemListTable({ problems,redirectToProblem, isUpcoming}){
+    
     const columns = [
         {
             title: 'Title',
@@ -96,12 +116,15 @@ function ProblemListTable({ problems,redirectToProblem }){
     return (
         <Table
             columns={columns}
-            dataSource={problems}
+            dataSource={isUpcoming ? [] : problems}
             rowKey="_id"
             getContainerWidth={100}
             pagination={false}
             size="small"
             className="w-9/12 ml-20 border-s-black"
+            locale={{
+                emptyText: 'Problems will display once contest is started!!',
+              }}
         />
     );
 };
