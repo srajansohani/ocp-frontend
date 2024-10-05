@@ -178,10 +178,10 @@ function Profile() {
                                     {
                                         label: (
                                             <div className="p-4">
-                                                Submission
+                                                Liked Problems
                                             </div>
                                         ),
-                                        value: "submissions",
+                                        value: "likes",
                                     },
                                 ]}
                                 onChange={(value) => {
@@ -205,7 +205,11 @@ function Profile() {
                             /> */}
 
                             <List
-                                dataSource={userData.solved_problems}
+                                dataSource={
+                                    segment === "problems"
+                                        ? userData.solved_problems
+                                        : userData.likes
+                                }
                                 renderItem={(item, index) => (
                                     <List.Item
                                         style={{ padding: "1.5rem 1rem" }}
@@ -220,7 +224,7 @@ function Profile() {
                                             );
                                         }}
                                     >
-                                        <Text>{item.title}</Text>{" "}
+                                        <Text>{item.title}</Text>
                                     </List.Item>
                                 )}
                             />

@@ -5,8 +5,8 @@ import { Checkbox, Flex, List, Space, Typography } from "antd";
 import Title from "antd/es/typography/Title";
 import { LeaderBoard } from "./LeaderBoard";
 import { LikeOutlined, TrophyFilled } from "@ant-design/icons";
-import { Table, Tag } from 'antd';
-import 'antd/dist/reset.css'; 
+import { Table, Tag } from "antd";
+import "antd/dist/reset.css";
 
 const { Text } = Typography;
 
@@ -29,7 +29,13 @@ export const Contest = () => {
             `/contest?contest_id=${contest_id}`
         );
         setContest(res.data);
-        setProblems([...res.data.problems.map((p)=>({...p.problem,score: p.score, isSolved: false}))]);
+        setProblems([
+            ...res.data.problems.map((p) => ({
+                ...p.problem,
+                score: p.score,
+                isSolved: false,
+            })),
+        ]);
     };
 
     useEffect(() => {
@@ -62,7 +68,7 @@ export const Contest = () => {
     };
 
     return (
-        <>
+        <div className="p-10">
             {contest && (
                 <>
                     <div>
@@ -73,40 +79,55 @@ export const Contest = () => {
                     <LeaderBoard isUpcoming={isUpcoming} contestId={contest.contest_id} />
                 </>
             )}
-        </>
+        </div>
     );
 };
 
-
 function ProblemListTable({ problems,redirectToProblem, isUpcoming}){
-    
     const columns = [
         {
-            title: 'Title',
-            dataIndex: 'title',
-            key: 'title',
-            render: (text,record)=><Space size="middle">
-            <p className=" cursor-pointer" onClick = {()=>{redirectToProblem(record._id)}}>{text}</p>
-        </Space>
+            title: "Title",
+            dataIndex: "title",
+            key: "title",
+            render: (text, record) => (
+                <Space size="middle">
+                    <p
+                        className=" cursor-pointer"
+                        onClick={() => {
+                            redirectToProblem(record._id);
+                        }}
+                    >
+                        {text}
+                    </p>
+                </Space>
+            ),
         },
         {
-            title: 'Score',
-            dataIndex: 'score',
-            key: 'score',
+            title: "Score",
+            dataIndex: "score",
+            key: "score",
         },
         {
-            title: 'Difficulty',
-            dataIndex: 'difficulty',
-            key: 'difficulty',
-            render: difficulty => (
-                <Tag color={difficulty === 'Easy' ? 'green' : difficulty === 'Medium' ? 'orange' : 'red'}>
+            title: "Difficulty",
+            dataIndex: "difficulty",
+            key: "difficulty",
+            render: (difficulty) => (
+                <Tag
+                    color={
+                        difficulty === "Easy"
+                            ? "green"
+                            : difficulty === "Medium"
+                            ? "orange"
+                            : "red"
+                    }
+                >
                     {difficulty}
                 </Tag>
             ),
         },
         {
-            title: 'Solved',
-            key: 'isSolved',
+            title: "Solved",
+            key: "isSolved",
             render: (_, record) => (
                 <Checkbox checked={record.isSolved} disabled />
             ),
@@ -127,7 +148,6 @@ function ProblemListTable({ problems,redirectToProblem, isUpcoming}){
               }}
         />
     );
-};
+}
 
 export default ProblemListTable;
-

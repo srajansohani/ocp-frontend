@@ -133,11 +133,10 @@ export const Problem = () => {
         let res;
 
         if (searchParams.get("contest_id")) {
-            console.log("submit to contest TODO");
-            // res = await axiosInstance.post(
-            //     "http://localhost:8000/contest/submission",
-            //     submission
-            // );
+            res = await axiosInstance.post("http://localhost:8000/submission", {
+                ...submission,
+                contest_id: searchParams.get("contest_id"),
+            });
         } else {
             res = await axiosInstance.post(
                 "http://localhost:8000/submission",
