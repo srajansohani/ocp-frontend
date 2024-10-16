@@ -1,6 +1,7 @@
 import { Button, Flex, Select } from "antd";
 import Title from "antd/es/typography/Title";
 import { useEffect, useState } from "react";
+import { arraysEqual, checkSubset } from "../../utils/helper";
 
 export const Filters = ({
     problems,
@@ -69,7 +70,7 @@ export const Filters = ({
 
     useEffect(() => {
         // console.log(problems);
-        const filteredProblems = problems;
+        let filteredProblems = [...problems];
 
         //sort by logic
         filteredProblems.sort((a, b) => {
@@ -84,14 +85,12 @@ export const Filters = ({
 
             return 0;
         });
+        //applying difficulty filter
+        filteredProblems = filteredProblems.filter((problem)=> !filters.difficulty || !filters.difficulty.length || filters.difficulty.find((diff)=>diff === problem.difficulty));
 
-        filteredProblems.forEach((problem) => {
-            console.log(problem.difficulty);
-        });
-
-        console.log("setting ...");
-
-        setFilteredProblems(filteredProblems);
+        //applying tags filter
+        filteredProblems = filteredProblems.filter((problem)=> !filters.tags || !filters.tags.length || !problem.tags || checkSubset(filters.tags,problem.tags))
+        setFilteredProblems([...filteredProblems]);
     }, [filters, problems]);
 
     return (
@@ -156,14 +155,14 @@ export const Filters = ({
                             }
                             options={[
                                 {
-                                    value: "easy",
+                                    value: "Easy",
                                     label: "Easy",
                                 },
                                 {
-                                    value: "medium",
+                                    value: "Medium",
                                     label: "Medium",
                                 },
-                                { value: "hard", label: "Hard" },
+                                { value: "Hard", label: "Hard" },
                             ]}
                         />
                     </Flex>
@@ -179,8 +178,8 @@ export const Filters = ({
                             className="w-60"
                             mode="multiple"
                             allowClear
-                            // onChange={handleChange}
-                            // style={{ width: 200 }}
+                            onChange={(value)=>{handleChange("tags",value)}}
+                            style={{ width: 200 }}
                             options={tags}
                         />
                     </Flex>

@@ -13,6 +13,7 @@ import { message, Spin } from "antd";
 import { addUserId, authenticate } from "../redux/userSlice";
 import { ContestList } from "./contest-list";
 import { Contest } from "./contest";
+import Home from "./Home";
 
 //Add all routes here
 function MainApp() {
@@ -75,13 +76,6 @@ function MainApp() {
     );
 }
 
-function Home() {
-    const userId = useSelector((store) => {
-        console.log(store);
-    });
-    useEffect(() => {}, []);
-    return <h2>Home</h2>;
-}
 
 function About() {
     return <h2>About</h2>;

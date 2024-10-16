@@ -24,7 +24,8 @@ const Signup = () => {
             message.success("Signup successful!");
             navigate("/");
         } catch (error) {
-            message.error(error.message);
+            console.log(error);
+            message.error(error.response.data.message);
         }
     };
 

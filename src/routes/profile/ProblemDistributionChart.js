@@ -50,11 +50,13 @@ const ProblemDistributionChart = ({ problemCount }) => {
     return (
         <Flex className="w-1/2 bg-white rounded-md shadow-lg p-4" gap="large">
             <Flex className="w-3/5 p-4">
-                <Doughnut
-                    data={finalData}
-                    options={options}
-                    plugins={[doughnutLabels]}
-                />
+                {
+                    (problemCount.Hard + problemCount.Easy+ problemCount.Medium === 0) ? "Please solve problems to see analytics" : <Doughnut
+                        data={finalData}
+                        options={options}
+                        plugins={[doughnutLabels]}
+                    />
+                }
             </Flex>
             <Flex vertical gap="middle" className="w-2/5 p-4">
                 <Flex className="bg-[#1cbaba48] p-4 rounded-lg justify-center align-middle">
