@@ -31,14 +31,14 @@ export const ProblemList = () => {
 
     const fetchProblems = async () => {
         const res = await axiosInstance.get(
-            "http://localhost:8000/problem/all"
+            "problem/all"
         );
 
         setProblems(res.data);
     };
 
     const fetchLikedProblems = async () => {
-        const res = await axiosInstance.get("http://localhost:8000/user/likes");
+        const res = await axiosInstance.get("user/likes");
         const likedProblems = {};
 
         res.data.liked_problems.forEach((problem_id) => {
@@ -227,7 +227,7 @@ export const ProblemList = () => {
                                 <List.Item.Meta
                                     title={<a href={item.href}>{item.title}</a>}
                                 />
-                                {item.desc}
+                                {(item.desc.slice(0,100))}....
                             </List.Item>
                         )}
                     />

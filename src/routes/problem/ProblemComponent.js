@@ -11,7 +11,7 @@ const ProblemComponent = ({ problem }) => {
     const [liked, setLiked] = useState();
 
     const fetchLikedProblems = async () => {
-        const res = await axiosInstance.get("http://localhost:8000/user/likes");
+        const res = await axiosInstance.get("/user/likes");
         let liked = false;
 
         res.data.liked_problems.forEach((problem_id) => {

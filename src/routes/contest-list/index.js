@@ -54,7 +54,7 @@ export const ContestList = () => {
     const getContests = async () => {
         try {
             const res = await axiosInstance.get(
-                "http://localhost:8000/contest/all"
+                "contest/all"
             );
             setContests(res.data);
         } catch (err) {

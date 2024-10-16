@@ -69,7 +69,7 @@ export const Playground = () => {
         );
         const data = res.data;
         setLoading(true);
-        intervalRef.current = setInterval(() => check(data._id), 500);
+        intervalRef.current = setInterval(() => check(data._id), 1000);
     };
     return (
         <>
